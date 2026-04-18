@@ -1,37 +1,91 @@
-const inputs = JSON.parse(localStorage.getItem("url"))||[]
-const inputs1 = JSON.parse(localStorage.getItem("nombre"))||[]
-function guardar() {
-    let input1 = document.getElementById("input1").value
-    let input = document.getElementById("input").value
-    let lista = document.getElementById("lista")
-    let crear_li=document.createElement("li")
-    let crear_img= document.createElement("img")
-    crear_li.textContent = input1
-    crear_img.src = input
-    lista.appendChild(crear_li)
-    lista.appendChild(crear_img) 
-    inputs.push(input)
-    inputs1.push(input1)
-    localStorage.setItem("nombre", JSON.stringify(inputs1))
-    localStorage.setItem("url", JSON.stringify(inputs))
+let tareas = JSON.parse(localStorage.getItem('tareas')) || []
+let historialAcciones = []
+
+function crear(tarea) {
+    tareas.push(tarea)
+    localStorage.setItem('tareas', JSON.stringify(tareas))
+    prepararDeshacerCrear(tarea)
 }
 
-window.onload = (e)=>{
-    let lista = document.getElementById("lista")
-    let nombres = JSON.parse(localStorage.getItem('nombre')) || []
-    let urls = JSON.parse(localStorage.getItem('url')) || []
-    for(let i = 0; i < urls.length; i++){
-        let crear_li = document.createElement('li')
-        crear_li.textContent = nombres[i] || ''
-        let crear_img = document.createElement('img')
-        crear_img.src = urls[i]
-        crear_li.appendChild(crear_img) 
-        lista.appendChild(crear_li)
+function prepararDeshacerCrear(tarea) {
+    let undoObject = {
+        fun: deshacerCrear,
+        data: [tareas.length, tarea] 
+    }
+    historialAcciones.push(undoObject)
+}
+
+function deshacerCrear(data) {
+    tareas.pop()
+    localStorage.setItem('tareas', JSON.stringify(tareas))
+}
+
+
+function eliminar(idTarea) {
+    prepararDeshacerEliminar(idTarea)
+    tareas.splice(idTarea, 1)
+    localStorage.setItem('tareas', JSON.stringify(tareas))
+}
+
+
+function prepararDeshacerEliminar(idTarea) {
+    let undoObject = {
+        fun: deshacerEliminar,
+        data: [idTarea, tareas[idTarea]]
+    }
+    historialAcciones.push(undoObject)
+}
+
+function deshacerEliminar(data) {
+    tareas.splice(data[0], 0, data[1])
+    localStorage.setItem('tareas', JSON.stringify(tareas))
+}
+
+function deshacer() {
+    let undoObject = historialAcciones[historialAcciones.length - 1]
+    historialAcciones.pop()
+    undoObject.fun(undoObject.data)
+    console.log(historialAcciones[historialAcciones.length - 1].data[1])
+}
+
+//parte visual
+window.onload = () => {
+    let ul_tareas = document.getElementById('ul_tareas')
+    let tareas = JSON.parse(localStorage.getItem('tareas')) || []
+    ul_tareas.innerHTML = ''
+    for (let i in tareas) {
+        let li = document.createElement('li')
+        li.textContent = tareas[i]
+        let button = document.createElement('button')
+        button.textContent = 'Eliminar'
+        button.onclick = () => btnEliminar(i)
+        li.appendChild(button)
+        ul_tareas.appendChild(li)
+
     }
 }
-function borrar() {
-    localStorage.clear()
-    const lista = document.getElementById('lista')
-    lista.innerText = ''
-    lista.src=''
+
+function btnCrear() {
+    let input_tarea = document.getElementById('input_tarea')
+    let ul_tareas = document.getElementById('ul_tareas')
+    let li = document.createElement('li')
+    crear(input_tarea.value)
+
+    li.textContent = input_tarea.value
+    ul_tareas.appendChild(li)
+    input_tarea.value = ''
+
+    window.onload()
+}
+
+function btnDeshacer() {
+    deshacer()
+    
+    window.onload()
+}
+
+function btnEliminar(i){
+    eliminar(i)
+
+    window.onload()
 }

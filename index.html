@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="app.js"></script>
+    <script src="./app.js"></script>
 </head>
 <body>
-    <input type="text" id="input1" placeholder="incerte el nombre"><br>
-    <input type="text" id="input" placeholder="inserte la url de la imagen"><br>
-    <button onclick="guardar()">guardar</button> <button onclick="borrar()">borrar</button>
-    <ul id="lista">
+    <h1>Lista te tareas</h1>
+    <div>
+        <input type="text" id="input_tarea">
+        <button onclick="btnCrear()">Crear tarea</button>
         
-    </ul>
+        <button onclick="btnDeshacer()">Deshacer</button>
+    </div>
+    <ul id="ul_tareas"></ul>
 </body>
 </html>
